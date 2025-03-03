@@ -21,9 +21,19 @@ const Signup: React.FC = () => {
 
         try {
             const response = await axios.post('http://localhost:8080/register', user);
-            console.log('User signed up successfully:', response.data);
+            if(response.status === 201){
+                alert('Signup successful');
+            }else{
+                alert('An error occurred. Response status: ' + response.status);
+            }
+            // Redirect to login page
+            window.location.href = '/login';
         } catch (error) {
-            console.error('There was an error signing up:', error);
+            if(error instanceof Error) {
+                alert("Error signing up: " + error.message);
+            }else{
+                alert('An error occurred. Please try again');
+            }
         }
     };
 
