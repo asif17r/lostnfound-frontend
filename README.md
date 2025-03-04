@@ -12,7 +12,7 @@ Make sure you have the following installed on your machine:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/lostnfound-frontend.git
+    git clone https://github.com/asif17r/lostnfound-frontend.git
     ```
 2. Navigate to the project directory:
     ```bash
@@ -27,7 +27,7 @@ Make sure you have the following installed on your machine:
 
 To start the development server, run:
 ```bash
-npm start
+npm run dev
 ```
 
 The application will be available at:
