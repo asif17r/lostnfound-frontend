@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
+import './home.css';
 
 interface Post {
     id: number;
@@ -41,30 +42,30 @@ const Home: React.FC = () => {
     }, [token]);
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="home-container">
+            <header className="home-header">
                 <button 
                     onClick={() => {
                         authContext?.logout();
                         window.location.href = '/';
                     }} 
-                    style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer' }}
+                    className="logout-button"
                 >
                     Logout
                 </button>
-                <a href="/profile" style={{ color: 'blue', textDecoration: 'none' }}>My Profile</a>
+                <a href="/profile" className="profile-link">My Profile</a>
             </header>
             <h1>Lost and Found</h1>
-            <ul style={{ listStyleType: 'none', padding: 0 }}>
+            <ul className="post-list">
                 {posts.map(post => (
-                    <li key={post.id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-                        <h2 style={{ margin: '0 0 10px 0' }}>{post.title}</h2>
-                        <p style={{ margin: 0 }}>{post.description}</p>
-                        <p style={{ margin: 0 }}><strong>Location:</strong> {post.location}</p>
-                        <p style={{ margin: 0 }}><strong>Date:</strong> {post.date}</p>
-                        <p style={{ margin: 0 }}><strong>Time:</strong> {post.time}</p>
-                        <p style={{ margin: 0 }}><strong>Category:</strong> {post.category}</p>
-                        <p style={{ margin: 0 }}><strong>Status:</strong> {post.status}</p>
+                    <li key={post.id} className="post-item">
+                        <h2 className="post-title">{post.title}</h2>
+                        <p className="post-text">{post.description}</p>
+                        <p className="post-text"><strong>Location:</strong> {post.location}</p>
+                        <p className="post-text"><strong>Date:</strong> {post.date}</p>
+                        <p className="post-text"><strong>Time:</strong> {post.time}</p>
+                        <p className="post-text"><strong>Category:</strong> {post.category}</p>
+                        <p className="post-text"><strong>Status:</strong> {post.status}</p>
                     </li>
                 ))}
             </ul>
