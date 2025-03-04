@@ -27,7 +27,7 @@ Make sure you have the following installed on your machine:
 
 To start the development server, run:
 ```bash
-npm start
+npm run dev
 ```
 
 The application will be available at:
