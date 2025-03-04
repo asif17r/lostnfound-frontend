@@ -1,50 +1,47 @@
-# React + TypeScript + Vite
+# Lost and Found Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the Lost and Found Frontend project! This README will guide you on how to set up and run the project locally.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Make sure you have the following installed on your machine:
+- Node.js (>= 14.x)
+- npm (>= 6.x)
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/lostnfound-frontend.git
+    ```
+2. Navigate to the project directory:
+    ```bash
+    cd lostnfound-frontend
+    ```
+3. Install the dependencies:
+    ```bash
+    npm install
+    ```
 
-- Configure the top-level `parserOptions` property like this:
+## Running the Project
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+To start the development server, run:
+```bash
+npm start
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+The application will be available at:
 ```
+http://localhost:5173
+```
+
+## Backend
+
+This project works in conjunction with the Spring Boot backend. You can find the backend repository here:
+[Spring Boot Backend](https://github.com/Learnathon-By-Geeky-Solutions/sketchboard)
+
+## Contact
+
+For any questions or feedback, please contact [asifurrahmanpabel@gmail.com](mailto:asifurrahmanpabel@gmail.com).
+
+Happy coding!
