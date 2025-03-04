@@ -1,28 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from './AuthContext';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const authContext = useContext(AuthContext);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            // interface LoginResponse {
-            //     token: string;
-            // }
             const response = await axios.post<string>('http://localhost:8080/login', {
                 email: username,
                 password: password
             });
-            const token = response.data;
-            console.log('Token:', token);
-            localStorage.setItem('token', token);
+            console.log('Response:', response);
+            if (response.status === 200) {
+                const token = response.data;
+                console.log('hi;');
+                // console.log('Token:', token);
+                authContext?.login(token);
 
-            window.location.href = '/home';
+                window.location.href = '/home';
+            } else {
+                alert("Error " + response.status + ": " + response.statusText);
+            }
         } catch (err) {
             setError('Invalid username or password');
+            console.error(err);
         }
     };
 

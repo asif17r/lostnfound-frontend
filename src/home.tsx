@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { AuthContext } from './AuthContext';
 
 interface Post {
     id: number;
@@ -18,6 +19,7 @@ const Home: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const token = localStorage.getItem('token');
     console.log('Token:', token);
+    const authContext = useContext(AuthContext);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -41,7 +43,13 @@ const Home: React.FC = () => {
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <button onClick={() => alert('Logout clicked')} style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer' }}>
+                <button 
+                    onClick={() => {
+                        authContext?.logout();
+                        window.location.href = '/';
+                    }} 
+                    style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer' }}
+                >
                     Logout
                 </button>
                 <a href="/profile" style={{ color: 'blue', textDecoration: 'none' }}>My Profile</a>
