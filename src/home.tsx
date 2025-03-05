@@ -1,25 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
 import './home.css';
+import { Post } from './Post';
 
-interface Post {
-    id: number;
-    title: string;
-    description: string;
-    location: string;
-    date: string;
-    time: string;
-    category: string;
-    status: string;
-    range: number;
-    uploadTime: string;
-    lastUpdatedTime: string;
-}
+
 
 const Home: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const token = localStorage.getItem('token');
-    console.log('Token:', token);
     const authContext = useContext(AuthContext);
 
     useEffect(() => {
@@ -55,7 +43,20 @@ const Home: React.FC = () => {
                 </button>
                 <a href="/profile" className="profile-link">My Profile</a>
             </header>
-            <h1>Lost and Found</h1>
+            <div className="header-content">
+                <h1>Lost and Found</h1>
+                <input 
+                    type="text" 
+                    placeholder="Search..." 
+                    className="search-box"
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            const query = (e.target as HTMLInputElement).value;
+                            window.location.href = `/search?q=${query}`;
+                        }
+                    }}
+                />
+            </div>
             <ul className="post-list">
                 {posts.map(post => (
                     <li key={post.id} className="post-item">
