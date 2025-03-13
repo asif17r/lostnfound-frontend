@@ -4,6 +4,11 @@ import axios from 'axios';
 import { Post } from './Post';
 import './home.css';  //for now
 
+interface searchQuery {
+    query: string;
+    limit: number;
+}
+
 const SearchPage: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
@@ -15,20 +20,26 @@ const SearchPage: React.FC = () => {
         const query = new URLSearchParams(location.search).get('q');
         console.log('Search query:', query);
         if (query) {
-            axios.get(`http://localhost:8080/search?q=${query}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+            const searchQuery: searchQuery = {
+            query: query,
+            limit: 20 // or any other limit you want to set
+            };
+            console.log('Search query object:', searchQuery);
+
+            axios.post('http://localhost:8080/enhancedSearch', searchQuery, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
             })
-                .then(response => {
-                    console.log('Search results:', response.data);
-                    setPosts(response.data as Post[]);
-                    setLoading(false);
-                })
-                .catch(error => {
-                    setError(error);
-                    setLoading(false);
-                });
+            .then(response => {
+                console.log('Search results:', response.data);
+                setPosts(response.data as Post[]);
+                setLoading(false);
+            })
+            .catch(error => {
+                setError(error);
+                setLoading(false);
+            });
         } else {
             setLoading(false);
         }
