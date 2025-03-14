@@ -56,6 +56,7 @@ const Home: React.FC = () => {
                         }
                     }}
                 />
+                <button onClick={() => navigate('/create-post')} className="create-post-button">Create Post</button>
             </div>
             <ul className="post-list">
                 {posts.map(post => (

@@ -9,6 +9,7 @@ import { AuthProvider } from './AuthContext';
 import Search from './search';
 import Profile from './profile';
 import PostDetails from './PostDetails';
+import CreatePost from './CreatePost';
 
 const App: React.FC = () => {
     return (
@@ -22,6 +23,7 @@ const App: React.FC = () => {
                     <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/posts/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
+                    <Route path="/create-post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
                     {/* Add other routes here */}
                 </Routes>
             </Router>
