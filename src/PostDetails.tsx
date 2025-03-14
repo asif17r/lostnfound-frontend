@@ -40,22 +40,6 @@ const PostDetails: React.FC = () => {
         }
     };
 
-    const handleUpdate = async () => {
-        try {
-            await fetch(`http://localhost:8080/posts/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(post) // Assuming `post` contains the updated data
-            });
-            // Optionally, you can refresh the post details or show a success message
-        } catch (error) {
-            console.error('Error updating post:', error);
-        }
-    };
-
     if (!post) {
         return <div>Loading...</div>;
     }
@@ -70,8 +54,8 @@ const PostDetails: React.FC = () => {
             <p><strong>Category:</strong> {post.category}</p>
             <p><strong>Status:</strong> {post.status}</p>
             <p><strong>User:</strong> {post.user.name} ({post.user.email})</p>
-            <button onClick={handleDelete} className="delete-button">Delete</button>
-            <button onClick={handleUpdate} className="update-button">Update</button>
+            <button onClick={handleDelete} className="delete-button">Delete</button>        
+            <button onClick={() => navigate(`/update-post/${post.id}`)} className="update-button">Update</button>
         </div>
     );
 };
