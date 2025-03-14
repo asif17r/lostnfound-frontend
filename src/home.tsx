@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import './home.css';
 import { Post } from './Post';
-
-
 
 const Home: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const token = localStorage.getItem('token');
     const authContext = useContext(AuthContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -64,42 +64,7 @@ const Home: React.FC = () => {
                         <p className="post-text"><strong>Category:</strong> {post.category}</p>
                         <p className="post-text"><strong>Status:</strong> {post.status}</p>
                         <button 
-                            onClick={async () => {
-                                try {
-                                    const response = await fetch(`http://localhost:8080/posts/${post.id}`, {
-                                        method: 'GET',
-                                        headers: {
-                                            'Authorization': `Bearer ${token}`
-                                        }
-                                    });
-                                    const data = await response.json();
-                                    const postDetails = `
-                                        Title: ${data.title}
-                                        Description: ${data.description}
-                                        Location: ${data.location}
-                                        Date: ${data.date}
-                                        Time: ${data.time}
-                                        Category: ${data.category}
-                                        Status: ${data.status}
-                                        User: ${data.user.name} (${data.user.email})
-                                    `;
-                                    const dialog = document.createElement('dialog');
-                                    dialog.innerHTML = `
-                                        ${postDetails.split('\n').map(line => `<p>${line}</p>`).join('')}
-                                        <button id="close-dialog">Close</button>
-                                    `;
-                                    document.body.appendChild(dialog);
-                                    dialog.showModal();
-                                    dialog.querySelector('#close-dialog')?.addEventListener('click', () => {
-                                        dialog.close();
-                                    });
-                                    dialog.addEventListener('close', () => {
-                                        document.body.removeChild(dialog);
-                                    });
-                                } catch (error) {
-                                    console.error('Error fetching post details:', error);
-                                }
-                            }}
+                            onClick={() => navigate(`/posts/${post.id}`)}
                             className="details-button"
                         >
                             See Details
