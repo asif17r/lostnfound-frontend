@@ -53,7 +53,7 @@ const PostDetails: React.FC = () => {
             <p><strong>Time:</strong> {post.time}</p>
             <p><strong>Category:</strong> {post.category}</p>
             <p><strong>Status:</strong> {post.status}</p>
-            <p><strong>User:</strong> {post.user.name} ({post.user.email})</p>
+            <p><strong>User ID:</strong> {post.userId}</p>
             <button onClick={handleDelete} className="delete-button">Delete</button>        
             <button onClick={() => navigate(`/update-post/${post.id}`)} className="update-button">Update</button>
         </div>
