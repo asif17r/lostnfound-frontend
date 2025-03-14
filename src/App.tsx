@@ -8,6 +8,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { AuthProvider } from './AuthContext';
 import Search from './search';
 import Profile from './profile';
+import PostDetails from './PostDetails';
 
 const App: React.FC = () => {
     return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
                     <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                     <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="/posts/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
                     {/* Add other routes here */}
                 </Routes>
             </Router>
