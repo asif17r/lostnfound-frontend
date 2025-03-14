@@ -39,7 +39,6 @@ const PostDetails: React.FC = () => {
             <p><strong>Category:</strong> {post.category}</p>
             <p><strong>Status:</strong> {post.status}</p>
             <p><strong>User:</strong> {post.user.name} ({post.user.email})</p>
-            <pre>{JSON.stringify(post, null, 2)}</pre>
         </div>
     );
 };
