@@ -5,6 +5,7 @@ const PostDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [post, setPost] = useState<any>(null);
     const token = localStorage.getItem('token');
+    const [myId, setMyId] = useState<number | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,6 +41,26 @@ const PostDetails: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchMyId = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/myId', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                setMyId(data); // Set myId to the fetched data
+                console.log('My ID:', data.id);
+            } catch (error) {
+                console.error('Error fetching my ID:', error);
+            }
+        };
+
+        fetchMyId();
+    }, [token]);
+
     if (!post) {
         return <div>Loading...</div>;
     }
@@ -54,8 +75,12 @@ const PostDetails: React.FC = () => {
             <p><strong>Category:</strong> {post.category}</p>
             <p><strong>Status:</strong> {post.status}</p>
             <p><strong>User ID:</strong> {post.userId}</p>
-            <button onClick={handleDelete} className="delete-button">Delete</button>        
-            <button onClick={() => navigate(`/update-post/${post.id}`)} className="update-button">Update</button>
+            {myId === post.userId && (
+                <>
+                    <button onClick={handleDelete} className="delete-button">Delete</button>        
+                    <button onClick={() => navigate(`/update-post/${post.id}`)} className="update-button">Update</button>
+                </>
+            )}
         </div>
     );
 };

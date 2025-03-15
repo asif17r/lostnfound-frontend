@@ -37,12 +37,12 @@ const Login: React.FC = () => {
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>
                     <div className="input-group">
-                        <label>Username:</label>
+                        <label>Email:</label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Enter your username"
+                            placeholder="Enter your email"
                         />
                     </div>
                     <div className="input-group">
