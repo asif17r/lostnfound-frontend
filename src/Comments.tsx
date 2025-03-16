@@ -14,30 +14,55 @@ interface CommentsProps {
 
 const Comments: React.FC<CommentsProps> = ({ postId }) => {
     const [comments, setComments] = useState<Comment[]>([]);
+    const [usernames, setUsernames] = useState<Map<number, string>>(new Map());
     const [content, setContent] = useState('');
     const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage
 
+    // Fetch comments
+    const fetchComments = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/comments`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            const filteredComments = data.filter((comment: Comment) => comment.postId === postId);
+            setComments(filteredComments);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+        }
+    };
+
+    // Fetch username by userId
+    const fetchUsername = async (userId: number) => {
+        if (usernames.has(userId)) return; // Avoid duplicate API calls
+
+        try {
+            const response = await fetch(`http://localhost:8080/profile/${userId}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error(`Failed to fetch user ${userId}`);
+
+            const userData = await response.json();
+            setUsernames(prev => new Map(prev.set(userId, userData.name)));
+        } catch (error) {
+            console.error('Error fetching username:', error);
+
+        }
+    };
+
+    // Fetch comments on component mount
     useEffect(() => {
-        const fetchComments = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/comments`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
-                const filteredComments = data.filter((comment: Comment) => comment.postId === postId);
-                setComments(filteredComments);
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-            }
-        };
-
         fetchComments();
     }, [postId, token]);
 
+    // Fetch usernames when comments change
+    useEffect(() => {
+        comments.forEach(comment => fetchUsername(comment.userId));
+    }, [comments]);
+
+    // Handle adding a new comment
     const handleAddComment = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -47,16 +72,13 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ content: content, postId, userId })
+                body: JSON.stringify({ content, postId, userId: localStorage.getItem('userId') })
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            const addedComment = await response.json();
-            setComments([...comments, addedComment]);
             setContent('');
+            fetchComments(); // Refresh comments
         } catch (error) {
             console.error('Error adding comment:', error);
         }
@@ -68,7 +90,13 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
             <ul>
                 {comments.map(comment => (
                     <li key={comment.id}>
-                        <p><strong>{comment.userId}:</strong> {comment.content}</p>
+                        <p>
+                            <strong>
+                                <a href={`/profile/${comment.userId}`}>
+                                    {usernames.get(comment.userId) || 'Loading...'}
+                                </a>
+                            </strong>: {comment.content}
+                        </p>
                         <p><small>{new Date(comment.createdAt).toLocaleString()}</small></p>
                     </li>
                 ))}

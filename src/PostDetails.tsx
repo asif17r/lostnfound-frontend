@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Comments from './Comments';
 
 const PostDetails: React.FC = () => {
+    const [usernames, setUsernames] = useState<Map<number, string>>(new Map());
     const { id } = useParams<{ id: string }>();
     const [post, setPost] = useState<any>(null);
     const token = localStorage.getItem('token');
     const [myId, setMyId] = useState<number | null>(null);
     const navigate = useNavigate();
 
+    // Fetch post details
     useEffect(() => {
         const fetchPostDetails = async () => {
             try {
@@ -20,6 +22,11 @@ const PostDetails: React.FC = () => {
                 });
                 const data = await response.json();
                 setPost(data);
+
+                // Fetch the username for the post author (userId)
+                if (data && data.userId) {
+                    fetchUsername(data.userId);
+                }
             } catch (error) {
                 console.error('Error fetching post details:', error);
             }
@@ -28,6 +35,25 @@ const PostDetails: React.FC = () => {
         fetchPostDetails();
     }, [id, token]);
 
+    // Fetch username for the userId
+    const fetchUsername = async (userId: number) => {
+        if (usernames.has(userId)) return; // Avoid duplicate API calls
+    
+        try {
+            const response = await fetch(`http://localhost:8080/profile/${userId}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error(`Failed to fetch user ${userId}`);
+    
+            const userData = await response.json();
+            setUsernames(prev => new Map(prev.set(userId, userData.name)));
+        } catch (error) {
+            console.error('Error fetching username:', error);
+        }
+    };
+
+    // Handle post deletion
     const handleDelete = async () => {
         try {
             await fetch(`http://localhost:8080/posts/${id}`, {
@@ -42,6 +68,7 @@ const PostDetails: React.FC = () => {
         }
     };
 
+    // Fetch my ID
     useEffect(() => {
         const fetchMyId = async () => {
             try {
@@ -75,15 +102,19 @@ const PostDetails: React.FC = () => {
             <p><strong>Time:</strong> {post.time}</p>
             <p><strong>Category:</strong> {post.category}</p>
             <p><strong>Status:</strong> {post.status}</p>
-            <p><strong>User ID:</strong> <a href={`/profile/${post.userId}`}>{post.userId}</a></p>
-            
+            <p><strong>User Name:</strong> 
+                <a href={`/profile/${post.userId}`}>
+                    {usernames.get(post.userId) || 'Loading...'}
+                </a>
+            </p>
+
             {myId === post.userId && (
                 <>
-                    <button onClick={handleDelete} className="delete-button">Delete</button>        
+                    <button onClick={handleDelete} className="delete-button">Delete</button>
                     <button onClick={() => navigate(`/update-post/${post.id}`)} className="update-button">Update</button>
                 </>
             )}
-            
+
             <Comments postId={post.id} />
         </div>
     );
