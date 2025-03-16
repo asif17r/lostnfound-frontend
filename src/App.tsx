@@ -8,6 +8,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { AuthProvider } from './AuthContext';
 import Search from './search';
 import Profile from './profile';
+import UserProfile from './UserProfile';
 import PostDetails from './PostDetails';
 import CreatePost from './CreatePost';
 import UpdatePost from './UpdatePost';
@@ -23,6 +24,7 @@ const App: React.FC = () => {
                     <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                     <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="/profile/:id" element={<UserProfile />} />
                     <Route path="/posts/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
                     <Route path="/create-post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
                     <Route path="/update-post/:id" element={<ProtectedRoute><UpdatePost /></ProtectedRoute>} />

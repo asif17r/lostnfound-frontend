@@ -52,13 +52,11 @@ const Profile: React.FC = () => {
                 {posts.map(post => (
                     <div key={post.id} className="post">
                         <h4>{post.title}</h4>
-                        <p>{post.description}</p>
-                        <p><strong>Location:</strong> {post.location}</p>
-                        <p><strong>Date:</strong> {post.date}</p>
-                        <p><strong>Time:</strong> {post.time}</p>
                         <p><strong>Category:</strong> {post.category}</p>
                         <p><strong>Status:</strong> {post.status}</p>
+                        <button onClick={() => window.location.href = `/posts/${post.id}`}>See Details</button>
                     </div>
+    
                 ))}
             </div>
         </div>
