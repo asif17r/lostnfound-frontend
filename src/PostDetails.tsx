@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Comments from './Comments';
 
 const PostDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -51,7 +52,7 @@ const PostDetails: React.FC = () => {
                     }
                 });
                 const data = await response.json();
-                setMyId(data); // Set myId to the fetched data
+                setMyId(data.id); // Set myId to the fetched data
                 console.log('My ID:', data.id);
             } catch (error) {
                 console.error('Error fetching my ID:', error);
@@ -74,13 +75,16 @@ const PostDetails: React.FC = () => {
             <p><strong>Time:</strong> {post.time}</p>
             <p><strong>Category:</strong> {post.category}</p>
             <p><strong>Status:</strong> {post.status}</p>
-            <p><strong>User ID:</strong> {post.userId}</p>
+            <p><strong>User ID:</strong> <a href={`/profile/${post.userId}`}>{post.userId}</a></p>
+            
             {myId === post.userId && (
                 <>
                     <button onClick={handleDelete} className="delete-button">Delete</button>        
                     <button onClick={() => navigate(`/update-post/${post.id}`)} className="update-button">Update</button>
                 </>
             )}
+            
+            <Comments postId={post.id} />
         </div>
     );
 };
