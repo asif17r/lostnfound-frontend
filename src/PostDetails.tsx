@@ -78,9 +78,11 @@ const PostDetails: React.FC = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                
                 const data = await response.json();
-                setMyId(data.id); // Set myId to the fetched data
-                console.log('My ID:', data.id);
+
+                setMyId(data); // Set myId to the fetched data
+                console.log('My ID:', data);
             } catch (error) {
                 console.error('Error fetching my ID:', error);
             }
@@ -107,7 +109,8 @@ const PostDetails: React.FC = () => {
                     {usernames.get(post.userId) || 'Loading...'}
                 </a>
             </p>
-
+            <p><strong>postuserid:</strong> {post.userId}</p>
+            <p><strong>myId:</strong> {myId}</p>
             {myId === post.userId && (
                 <>
                     <button onClick={handleDelete} className="delete-button">Delete</button>
