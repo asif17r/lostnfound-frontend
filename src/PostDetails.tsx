@@ -47,7 +47,7 @@ const PostDetails: React.FC = () => {
             if (!response.ok) throw new Error(`Failed to fetch user ${userId}`);
     
             const userData = await response.json();
-            setUsernames(prev => new Map(prev.set(userId, userData.name)));
+            setUsernames(prev => new Map(prev.set(userId, userData.user.name)));
         } catch (error) {
             console.error('Error fetching username:', error);
         }
@@ -109,8 +109,6 @@ const PostDetails: React.FC = () => {
                     {usernames.get(post.userId) || 'Loading...'}
                 </a>
             </p>
-            <p><strong>postuserid:</strong> {post.userId}</p>
-            <p><strong>myId:</strong> {myId}</p>
             {myId === post.userId && (
                 <>
                     <button onClick={handleDelete} className="delete-button">Delete</button>

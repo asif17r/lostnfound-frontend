@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
+import { Post } from './Post';
 
 const UserProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<any>(null);
+    const [posts, setPosts] = useState<Post[]>([]);
     const token = localStorage.getItem('token');
 
     useEffect(() => {
@@ -17,7 +18,8 @@ const UserProfile: React.FC = () => {
                     }
                 });
                 const data = await response.json();
-                setUser(data);
+                setUser(data.user);
+                setPosts(data.posts);
             } catch (error) {
                 console.error('Error fetching user profile:', error);
             }
@@ -37,8 +39,21 @@ const UserProfile: React.FC = () => {
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>Address:</strong> {user.address}</p>
                 <p><strong>Department:</strong> {user.department}</p>
-            </div>    
+            </div>  
+            <div className="user-posts">
+                <h3>User Posts</h3>
+                {posts.map(post => (
+                    <div key={post.id} className="post">
+                        <h4>{post.title}</h4>
+                        <p><strong>Category:</strong> {post.category}</p>
+                        <p><strong>Status:</strong> {post.status}</p>
+                        <button onClick={() => window.location.href = `/posts/${post.id}`}>See Details</button>
+                    </div>
+    
+                ))}
+            </div>  
          </div>
+         
 
     );
 };

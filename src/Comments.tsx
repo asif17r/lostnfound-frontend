@@ -45,7 +45,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
             if (!response.ok) throw new Error(`Failed to fetch user ${userId}`);
 
             const userData = await response.json();
-            setUsernames(prev => new Map(prev.set(userId, userData.name)));
+            setUsernames(prev => new Map(prev.set(userId, userData.user.name)));
         } catch (error) {
             console.error('Error fetching username:', error);
 
