@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Post } from './Post';
 import './home.css';  //for now
@@ -15,7 +15,7 @@ const SearchPage: React.FC = () => {
     const [error, setError] = useState<Error | null>(null);
     const location = useLocation();
     const token = localStorage.getItem('token');
-
+    const navigate = useNavigate();
     useEffect(() => {
         const query = new URLSearchParams(location.search).get('q');
         console.log('Search query:', query);
@@ -61,12 +61,14 @@ const SearchPage: React.FC = () => {
                 {posts.map(post => (
                 <li key={post.id} className="post-item">
                     <h2 className="post-title">{post.title}</h2>
-                    <p className="post-text">{post.description}</p>
-                    <p className="post-text"><strong>Location:</strong> {post.location}</p>
-                    <p className="post-text"><strong>Date:</strong> {post.date}</p>
-                    <p className="post-text"><strong>Time:</strong> {post.time}</p>
                     <p className="post-text"><strong>Category:</strong> {post.category}</p>
                     <p className="post-text"><strong>Status:</strong> {post.status}</p>
+                    <button 
+                            onClick={() => navigate(`/posts/${post.id}`)}
+                            className="details-button"
+                        >
+                            See Details
+                    </button>
                 </li>
                 ))}
             </ul>
