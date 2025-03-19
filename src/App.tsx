@@ -12,6 +12,7 @@ import UserProfile from './UserProfile';
 import PostDetails from './PostDetails';
 import CreatePost from './CreatePost';
 import UpdatePost from './UpdatePost';
+import UpdateComment from './UpdateComment';
 
 const App: React.FC = () => {
     return (
@@ -28,6 +29,7 @@ const App: React.FC = () => {
                     <Route path="/posts/:id" element={<ProtectedRoute><PostDetails /></ProtectedRoute>} />
                     <Route path="/create-post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
                     <Route path="/update-post/:id" element={<ProtectedRoute><UpdatePost /></ProtectedRoute>} />
+                    <Route path="/update-comment/:id" element={<ProtectedRoute><UpdateComment /></ProtectedRoute>} />
                     {/* Add other routes here */}
                 </Routes>
             </Router>
