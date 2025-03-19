@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Comment {
     id: number;
@@ -16,7 +17,29 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
     const [comments, setComments] = useState<Comment[]>([]);
     const [usernames, setUsernames] = useState<Map<number, string>>(new Map());
     const [content, setContent] = useState('');
+    const [userId, setUserId] = useState<number | null>(null);
     const token = localStorage.getItem('token');
+    const navigate = useNavigate();
+
+    // Fetch user ID
+    useEffect(() => {
+        const fetchUserId = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/myId', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                setUserId(data);
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
+            }
+        };
+
+        fetchUserId();
+    }, [token]);
 
     // Fetch comments
     const fetchComments = async () => {
@@ -48,7 +71,6 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
             setUsernames(prev => new Map(prev.set(userId, userData.user.name)));
         } catch (error) {
             console.error('Error fetching username:', error);
-
         }
     };
 
@@ -65,6 +87,8 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
     // Handle adding a new comment
     const handleAddComment = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (userId === null) return;
+
         try {
             const response = await fetch('http://localhost:8080/comments', {
                 method: 'POST',
@@ -72,7 +96,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ content, postId, userId: localStorage.getItem('userId') })
+                body: JSON.stringify({ content, postId, userId })
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -83,6 +107,25 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
             console.error('Error adding comment:', error);
         }
     };
+
+    // Handle deleting a comment
+    const handleDeleteComment = async (commentId: number) => {
+        try {
+            await fetch(`http://localhost:8080/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            fetchComments(); // Refresh comments
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+        }
+    };
+
+    if (userId === null) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="comments-section">
@@ -98,6 +141,12 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
                             </strong>: {comment.content}
                         </p>
                         <p><small>{new Date(comment.createdAt).toLocaleString()}</small></p>
+                        {userId === comment.userId && (
+                            <>
+                                <button onClick={() => navigate(`/update-comment/${comment.id}`)}>Update</button>
+                                <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
+                            </>
+                        )}
                     </li>
                 ))}
             </ul>
