@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Post } from './Post';
 import './profile.css';
-
+import { useNavigate } from 'react-router-dom';
 interface User {
     userId: number;
     name: string;
@@ -20,6 +20,7 @@ const Profile: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const token = localStorage.getItem('token');
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get('http://localhost:8080/profile', {
@@ -46,6 +47,7 @@ const Profile: React.FC = () => {
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>Address:</strong> {user.address}</p>
                 <p><strong>Department:</strong> {user.department}</p>
+                <button onClick={() => navigate('/updateProfile')}>Update Profile</button>
 
             </div>
             <div className="user-posts">
