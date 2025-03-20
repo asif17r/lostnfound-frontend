@@ -46,6 +46,7 @@ const Profile: React.FC = () => {
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>Address:</strong> {user.address}</p>
                 <p><strong>Department:</strong> {user.department}</p>
+
             </div>
             <div className="user-posts">
                 <h3>User Posts</h3>
