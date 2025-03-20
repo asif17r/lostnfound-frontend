@@ -12,6 +12,7 @@ import UserProfile from './UserProfile';
 import PostDetails from './PostDetails';
 import CreatePost from './CreatePost';
 import UpdatePost from './UpdatePost';
+import UpdateProfile from './UpdateProfile';
 import UpdateComment from './UpdateComment';
 
 const App: React.FC = () => {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
                     <Route path="/create-post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
                     <Route path="/update-post/:id" element={<ProtectedRoute><UpdatePost /></ProtectedRoute>} />
                     <Route path="/update-comment/:id" element={<ProtectedRoute><UpdateComment /></ProtectedRoute>} />
+                    <Route path="UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
                     {/* Add other routes here */}
                 </Routes>
             </Router>
