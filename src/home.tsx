@@ -90,7 +90,7 @@ const Home: React.FC = () => {
         <div className="home-container">
             <header className="home-header">
                 <div className="header-left">
-                    <h1>Lost & Found</h1>
+                    <h1 onClick={() => window.location.reload()} style={{ cursor: 'pointer', color: '#4A90E2', fontSize: '2rem', fontWeight: 'bold' }}>Lost & Found</h1>
                 </div>
                 <div className="header-right">
                     <button className="create-post-btn" onClick={() => navigate('/create-post')}>

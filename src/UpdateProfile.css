@@ -1,0 +1,74 @@
+/* UpdateProfile.css */
+.update-profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.update-profile-container h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #007bff;
+    font-family: 'Arial', sans-serif;
+    font-size: 2em;
+}
+
+.update-profile-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.update-profile-container form div {
+    margin-bottom: 20px;
+}
+
+.update-profile-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.update-profile-container input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.update-profile-container input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.update-profile-container button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.update-profile-container button[type="button"] {
+    background-color: #6c757d;
+}
+
+.update-profile-container button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.update-profile-container button[type="button"]:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './UpdateProfile.css';
 
 interface User {
     userId: number;
@@ -84,8 +85,10 @@ const UpdateProfile: React.FC = () => {
                     <label>Department:</label>
                     <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)} required />
                 </div>
-                <button type="submit">Update Profile</button>
-                <button type="button" onClick={() => navigate('/profile')}>Cancel</button>
+                <div className="button-group">
+                    <button type="submit" style={{ float: 'left' }}>Update Profile</button>
+                    <button type="button" style={{ float: 'right' }} onClick={() => navigate('/profile')}>Cancel</button>
+                </div>
             </form>
         </div>
     );

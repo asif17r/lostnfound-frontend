@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Post } from './Post';
 import './profile.css';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
 
 interface User {
     userId: number;
@@ -38,7 +37,6 @@ const Profile: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
-    const { handleUpdateProfile, handleViewMessages } = useAuth();
 
     useEffect(() => {
         axios.get('http://localhost:8080/profile', {
@@ -85,7 +83,7 @@ const Profile: React.FC = () => {
                         <h4>{post.title}</h4>
                         <p><strong>Category:</strong> {post.category}</p>
                         <p><strong>Status:</strong> {post.status}</p>
-                        <button onClick={() => window.location.href = `/posts/${post.id}`}>See Details</button>
+                        <button onClick={() => window.location.href = `/post/${post.id}`}>See Details</button>
                     </div>
     
                 ))}
