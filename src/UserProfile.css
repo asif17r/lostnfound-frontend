@@ -137,6 +137,10 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
 }
 
 .message-btn:hover {
