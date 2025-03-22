@@ -44,19 +44,18 @@ const UpdatePost: React.FC = () => {
             const response = await fetch(`http://localhost:8080/posts/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ title, description, date, time, status, category, location })
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                navigate('/');
+            } else {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            const jsonResponse = await response.json();
-            console.log('Response JSON:', jsonResponse);
-            navigate(`/posts/${id}`); // Redirect to post details after update
         } catch (error) {
             console.error('Error updating post:', error);
         }

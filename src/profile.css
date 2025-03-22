@@ -61,3 +61,38 @@
 .post p strong {
     color: #333;
 }
+
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.update-profile-btn, .message-btn {
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.update-profile-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.update-profile-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.message-btn {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.message-btn:hover {
+    background-color: var(--background-hover);
+    border-color: var(--primary-color);
+}

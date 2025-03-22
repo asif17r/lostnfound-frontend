@@ -1,103 +1,133 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import './login.css';
 
 const Signup: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [address, setAddress] = useState('');
     const [department, setDepartment] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const { signup } = useAuth();
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        const user = {
-            name,
-            email,
-            password,
-            address,
-            department,
-            role: 'USER'
-        };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
 
         try {
-            const response = await axios.post('http://localhost:8080/register', user);
-            if(response.status === 201){
-                alert('Signup successful');
-            }else{
-                alert('An error occurred. Response status: ' + response.status);
-            }
-            // Redirect to login page
-            window.location.href = '/login';
-        } catch (error) {
-            if(error instanceof Error) {
-                alert("Error signing up: " + error.message);
-            }else{
-                alert('An error occurred. Please try again');
-            }
+            await signup({
+                name,
+                email,
+                password,
+                address,
+                department
+            });
+            navigate('/home');
+        } catch (err) {
+            setError('Failed to create account. Please try again.');
         }
     };
 
     return (
-        <div>
-            <h2>Signup</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Name:</label>
-                    <br />
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
+        <div className="auth-page">
+            <div className="auth-container">
+                <div className="auth-header">
+                    <h1>Create Account</h1>
+                    <p>Join Lost & Found to start helping others</p>
                 </div>
-                <br />
-                <div>
-                    <label>Email:</label>
-                    <br />
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
+                
+                <form onSubmit={handleSubmit} className="auth-form">
+                    {error && <div className="error-message">{error}</div>}
+                    
+                    <div className="form-group">
+                        <label htmlFor="name">Full Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="e.g., John Doe"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="e.g., john.doe@example.com"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="e.g., MySecurePass123!"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="confirmPassword">Confirm Password</label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="e.g., MySecurePass123!"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="address">Address</label>
+                        <input
+                            type="text"
+                            id="address"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            placeholder="e.g., 123 Main St, City, Country"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="department">Department</label>
+                        <input
+                            type="text"
+                            id="department"
+                            value={department}
+                            onChange={(e) => setDepartment(e.target.value)}
+                            placeholder="e.g., Computer Science"
+                            required
+                        />
+                    </div>
+
+                    <button type="submit" className="auth-button">
+                        Create Account
+                    </button>
+                </form>
+
+                <div className="auth-footer">
+                    <p>Already have an account? <Link to="/login">Sign in</Link></p>
                 </div>
-                <br />
-                <div>
-                    <label>Password:</label>
-                    <br />
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <br />
-                <div>
-                    <label>Address:</label>
-                    <br />
-                    <input
-                        type="text"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        required
-                    />
-                </div>
-                <br />
-                <div>
-                    <label>Department:</label>
-                    <br />
-                    <input
-                        type="text"
-                        value={department}
-                        onChange={(e) => setDepartment(e.target.value)}
-                        required
-                    />
-                </div>
-                <br />
-                <button type="submit">Signup</button>
-            </form>
+            </div>
         </div>
     );
 };

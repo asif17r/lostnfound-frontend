@@ -1,62 +1,71 @@
-import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import { AuthContext } from './AuthContext';
-import './login.css'; 
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import './login.css';
 
 const Login: React.FC = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const authContext = useContext(AuthContext);
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post<string>('http://localhost:8080/login', {
-                email: username,
-                password: password
-            });
-            console.log('Response:', response);
-            if (response.status === 200) {
-                const token = response.data;
-                authContext?.login(token);
-                window.location.href = '/home';
-            } else {
-                alert("Error " + response.status + ": " + response.statusText);
-            }
+            await login(email, password);
+            navigate('/home');
         } catch (err) {
-            setError('Invalid username or password');
-            console.error(err);
+            setError('Invalid email or password');
         }
     };
 
     return (
-        <div className="login-container login-page">
-            <div className="login-box">
-                <h2>Login</h2>
-                <form onSubmit={handleLogin}>
-                    <div className="input-group">
-                        <label>Email:</label>
+        <div className="auth-page">
+            <div className="auth-container">
+                <div className="auth-header">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to continue to Lost & Found</p>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="auth-form">
+                    {error && <div className="error-message">{error}</div>}
+                    
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
                         <input
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
+                            required
                         />
                     </div>
-                    <div className="input-group">
-                        <label>Password:</label>
+
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
                         <input
                             type="password"
+                            id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
+                            required
                         />
                     </div>
-                    {error && <p className="error">{error}</p>}
-                    <button type="submit" className="login-button">Login</button>
+
+                    <button type="submit" className="auth-button">
+                        Sign In
+                    </button>
                 </form>
+
+                <div className="auth-footer">
+                    <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
+                    <Link to="/forgot-password" className="forgot-password">
+                        Forgot password?
+                    </Link>
+                </div>
             </div>
         </div>
     );

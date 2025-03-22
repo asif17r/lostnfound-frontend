@@ -32,6 +32,8 @@ const Profile: React.FC = () => {
             const data = response.data as { user: User; posts: Post[] };
             setUser(data.user);
             setPosts(data.posts);
+            // Store the userId in localStorage for later use
+            localStorage.setItem('userId', data.user.userId.toString());
             })
             .catch(error => console.error('Error fetching profile data:', error));
     }, []);
@@ -47,8 +49,10 @@ const Profile: React.FC = () => {
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>Address:</strong> {user.address}</p>
                 <p><strong>Department:</strong> {user.department}</p>
-                <button onClick={() => navigate('/updateProfile')}>Update Profile</button>
-
+                <div className="profile-actions">
+                    <button onClick={() => navigate('/updateProfile')} className="update-profile-btn">Update Profile</button>
+                    <button onClick={() => navigate('/inbox')} className="message-btn">View Messages</button>
+                </div>
             </div>
             <div className="user-posts">
                 <h3>User Posts</h3>

@@ -1,0 +1,144 @@
+.profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--background-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.user-info {
+    background-color: var(--background-secondary);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+}
+
+.user-info h2 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.user-info p {
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+}
+
+.user-posts {
+    background-color: var(--background-secondary);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+}
+
+.user-posts h3 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.post {
+    background-color: var(--background-color);
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.post h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.post p {
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+}
+
+.post button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.post button:hover {
+    background-color: var(--primary-hover);
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--background-secondary);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+    text-align: center;
+}
+
+.error-container button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.error-container button:hover {
+    background-color: var(--primary-hover);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .user-info,
+    .user-posts {
+        padding: 1rem;
+    }
+}
+
+.message-btn {
+    margin-top: 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.message-btn:hover {
+    background-color: var(--primary-hover);
+} 

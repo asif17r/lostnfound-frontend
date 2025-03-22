@@ -7,22 +7,37 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { token, isTokenValid } = useContext(AuthContext) || {};
+    const context = useContext(AuthContext);
     const [isValid, setIsValid] = useState<boolean | null>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
-            if (isTokenValid) {
-                const valid = await isTokenValid();
+            if (!context?.token || !context?.isTokenValid) {
+                setIsValid(false);
+                return;
+            }
+
+            try {
+                const valid = await context.isTokenValid();
                 setIsValid(valid);
+            } catch (error) {
+                console.error('Error checking token validity:', error);
+                setIsValid(false);
             }
         };
         checkAuth();
-    }, [token, isTokenValid]);
+    }, [context]);
 
-    if (isValid === null) return <div>Loading...</div>;
+    if (isValid === null) {
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading...</p>
+            </div>
+        );
+    }
 
-    return isValid ? children : <Navigate to="/login" />;
+    return isValid ? <>{children}</> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;

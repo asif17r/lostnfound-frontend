@@ -1,8 +1,18 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useContext } from 'react';
+import axios from 'axios';
+
+interface SignupData {
+    name: string;
+    email: string;
+    password: string;
+    address: string;
+    department: string;
+}
 
 interface AuthContextType {
     token: string | null;
-    login: (newToken: string) => void;
+    login: (email: string, password: string) => Promise<void>;
+    signup: (data: SignupData) => Promise<void>;
     logout: () => void;
     isTokenValid: () => Promise<boolean>;
 }
@@ -13,13 +23,46 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
-    const login = (newToken: string) => {
-        localStorage.setItem('token', newToken);
-        setToken(newToken);
-        console.log('new Token:', newToken);
+    const login = async (email: string, password: string) => {
+        try {
+            const response = await axios.post<string>('http://localhost:8080/login', {
+                email,
+                password
+            });
+            const newToken = response.data;
+            localStorage.setItem('token', newToken);
+            setToken(newToken);
+        } catch (error) {
+            throw new Error('Invalid email or password');
+        }
+    };
+
+    const signup = async (data: SignupData) => {
+        try {
+            const response = await axios.post('http://localhost:8080/register', {
+                ...data,
+                role: 'USER'
+            });
+            if (response.status === 201) {
+                // After successful signup, automatically log in
+                await login(data.email, data.password);
+            } else {
+                throw new Error('Failed to create account');
+            }
+        } catch (error) {
+            throw new Error('Failed to create account');
+        }
     };
 
     const logout = () => {
@@ -28,8 +71,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const isTokenValid = async (): Promise<boolean> => {
-        console.log('Checking if token is valid inside isTokenValid');
-        console.log('Token:', token);
         if (!token) return false;
 
         try {
@@ -49,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ token, login, logout, isTokenValid }}>
+        <AuthContext.Provider value={{ token, login, signup, logout, isTokenValid }}>
             {children}
         </AuthContext.Provider>
     );

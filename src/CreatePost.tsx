@@ -15,22 +15,22 @@ const CreatePost: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const postData = { title, description, location, date, time, status, category };
             const response = await fetch('http://localhost:8080/posts', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ title, description,location, date, time, status, category })
+                body: JSON.stringify(postData)
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                navigate('/');
+            } else {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            const jsonResponse = await response.json();
-            console.log('Response JSON:', jsonResponse);
-            navigate('/home'); // Redirect to home after creation
         } catch (error) {
             console.error('Error creating post:', error);
         }
