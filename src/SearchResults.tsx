@@ -12,9 +12,10 @@ interface SearchQuery {
 }
 
 const SearchResults: React.FC = () => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [posts, setPosts] = useState<PostData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searching, setSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const { token, logout, isTokenValid } = useAuth();
@@ -45,6 +46,7 @@ const SearchResults: React.FC = () => {
     }, [searchParams, token, navigate, isTokenValid]);
 
     const fetchSearchResults = async (query: string) => {
+        setSearching(true);
         try {
             const searchBody: SearchQuery = {
                 query: query,
@@ -76,21 +78,26 @@ const SearchResults: React.FC = () => {
             console.error('Error fetching search results:', error);
         } finally {
             setLoading(false);
+            setSearching(false);
         }
     };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchParams({ q: searchQuery.trim() });
         }
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
     };
 
     if (loading) {
         return (
             <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p>Searching...</p>
+                <p>Loading...</p>
             </div>
         );
     }
@@ -117,7 +124,7 @@ const SearchResults: React.FC = () => {
                                 type="text"
                                 placeholder="Search lost & found items..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={handleSearchChange}
                                 className="search-input"
                             />
                         </div>
@@ -126,29 +133,38 @@ const SearchResults: React.FC = () => {
             </header>
 
             <main className="search-content">
-                <div className="search-info">
-                    <h2>Results for "{searchQuery}"</h2>
-                    <p>{posts.length} {posts.length === 1 ? 'result' : 'results'} found</p>
-                </div>
-
-                <div className="search-results">
-                    {posts.length === 0 ? (
-                        <div className="no-results">
-                            <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
-                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
-                            <h3>No results found</h3>
-                            <p>Try adjusting your search terms or browse all items</p>
-                            <button onClick={() => navigate('/home')} className="browse-all-btn">
-                                Browse All Items
-                            </button>
+                {searching ? (
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>Searching...</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="search-info">
+                            <h2>Results for "{searchQuery}"</h2>
+                            <p>{posts.length} {posts.length === 1 ? 'result' : 'results'} found</p>
                         </div>
-                    ) : (
-                        posts.map((post) => (
-                            <Post key={post.id} post={post} />
-                        ))
-                    )}
-                </div>
+
+                        <div className="search-results">
+                            {posts.length === 0 ? (
+                                <div className="no-results">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                    </svg>
+                                    <h3>No results found</h3>
+                                    <p>Try adjusting your search terms or browse all items</p>
+                                    <button onClick={() => navigate('/home')} className="browse-all-btn">
+                                        Browse All Items
+                                    </button>
+                                </div>
+                            ) : (
+                                posts.map((post) => (
+                                    <Post key={post.id} post={post} />
+                                ))
+                            )}
+                        </div>
+                    </>
+                )}
             </main>
         </div>
     );

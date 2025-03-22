@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import './createPost.css';
 
 const CreatePost: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -9,13 +11,19 @@ const CreatePost: React.FC = () => {
     const [location, setLocation] = useState('');
     const [status, setStatus] = useState('LOST');
     const [category, setCategory] = useState('DOCUMENTS');
-    const token = localStorage.getItem('token');
+    const [range, setRange] = useState(5); // Default range of 5km
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { token } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+        setError(null);
+
         try {
-            const postData = { title, description, location, date, time, status, category };
+            const postData = { title, description, location, date, time, status, category, range };
             const response = await fetch('http://localhost:8080/posts', {
                 method: 'POST',
                 headers: {
@@ -26,59 +34,181 @@ const CreatePost: React.FC = () => {
             });
 
             if (response.ok) {
-                const jsonResponse = await response.json();
-                navigate('/');
+                navigate('/home');
             } else {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create post');
             }
         } catch (error) {
-            console.error('Error creating post:', error);
+            setError(error instanceof Error ? error.message : 'An error occurred while creating the post');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleCancel = () => {
+        navigate('/home');
     };
 
     return (
         <div className="create-post-container">
-            <h1>Create Post</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Title:</label>
-                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            <div className="create-post-header">
+                <button onClick={handleCancel} className="back-button">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                    Back to Home
+                </button>
+                <h1>Create New Post</h1>
+            </div>
+
+            <form onSubmit={handleSubmit} className="create-post-form">
+                <div className="form-group">
+                    <label htmlFor="title">Title</label>
+                    <input
+                        id="title"
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Enter a descriptive title"
+                        required
+                    />
                 </div>
-                <div>
-                    <label>Description:</label>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
+
+                <div className="form-group">
+                    <label htmlFor="description">Description</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Provide detailed information about your lost or found item"
+                        required
+                    />
                 </div>
-                <div>
-                    <label>Date:</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="date">Date</label>
+                        <input
+                            id="date"
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="time">Time</label>
+                        <input
+                            id="time"
+                            type="time"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                            required
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label>Time:</label>
-                    <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+
+                <div className="form-group">
+                    <label htmlFor="location">Location</label>
+                    <input
+                        id="location"
+                        type="text"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="Where did you lose/find the item?"
+                        required
+                    />
                 </div>
-                <div>
-                    <label>Location:</label>
-                    <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} required />
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="status">Status</label>
+                        <select
+                            id="status"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                            required
+                        >
+                            <option value="LOST">Lost</option>
+                            <option value="FOUND">Found</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="category">Category</label>
+                        <select
+                            id="category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                        >
+                            <option value="DOCUMENTS">Documents</option>
+                            <option value="ELECTRONICS">Electronics</option>
+                            <option value="JEWELLERIES">Jewelleries</option>
+                            <option value="ACCESSORIES">Accessories</option>
+                            <option value="CLOTHES">Clothes</option>
+                            <option value="MOBILE">Mobile</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label>Status:</label>
-                    <select value={status} onChange={(e) => setStatus(e.target.value)} required>
-                        <option value="LOST">LOST</option>
-                        <option value="FOUND">FOUND</option>
-                    </select>
+
+                <div className="form-group">
+                    <label htmlFor="range">Search Radius (km)</label>
+                    <div className="range-input-container">
+                        <input
+                            id="range"
+                            type="range"
+                            min="1"
+                            max="50"
+                            value={range}
+                            onChange={(e) => setRange(Number(e.target.value))}
+                            className="range-input"
+                        />
+                        <span className="range-value">{range} km</span>
+                    </div>
+                    <p className="range-description">Set the radius within which the item might be found</p>
                 </div>
-                <div>
-                    <label>Category:</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-                        <option value="DOCUMENTS">DOCUMENTS</option>
-                        <option value="ELECTRONICS">ELECTRONICS</option>
-                        <option value="JEWELLERIES">JEWELLERIES</option>
-                        <option value="ACCESSORIES">ACCESSORIES</option>
-                        <option value="CLOTHES">CLOTHES</option>
-                        <option value="MOBILE">MOBILE</option>
-                    </select>
+
+                {error && (
+                    <div className="error-message">
+                        {error}
+                    </div>
+                )}
+
+                <div className="form-actions">
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="cancel-button"
+                        disabled={loading}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="submit-button"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <>
+                                <svg className="animate-spin" viewBox="0 0 24 24" width="18" height="18">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                </svg>
+                                Creating...
+                            </>
+                        ) : (
+                            <>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                                Create Post
+                            </>
+                        )}
+                    </button>
                 </div>
-                <button type="submit">Create Post</button>
             </form>
         </div>
     );

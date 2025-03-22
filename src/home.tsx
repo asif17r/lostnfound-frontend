@@ -6,6 +6,21 @@ import './home.css';
 
 interface PostData extends PostType {}
 
+// Add icons
+const CreatePostIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
+
 const Home: React.FC = () => {
     const [posts, setPosts] = useState<PostData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -78,20 +93,26 @@ const Home: React.FC = () => {
                     <h1>Lost & Found</h1>
                 </div>
                 <div className="header-right">
-                    <form onSubmit={handleSearch} className="search-form">
-                        <div className="search-input-wrapper">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" className="search-icon">
-                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
-                            <input
-                                type="text"
-                                placeholder="Search lost & found items..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="search-input"
-                            />
-                        </div>
-                    </form>
+                    <button className="create-post-btn" onClick={() => navigate('/create-post')}>
+                        <CreatePostIcon />
+                        Create Post
+                    </button>
+                    
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            className="search-bar"
+                            placeholder="Search posts..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearch(e);
+                                }
+                            }}
+                        />
+                    </div>
+
                     <div className="profile-menu">
                         <button 
                             className="profile-button"
