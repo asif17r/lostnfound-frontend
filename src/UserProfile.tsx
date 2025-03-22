@@ -41,10 +41,11 @@ const UserProfile: React.FC = () => {
 
     const handleMessageUser = () => {
         // Navigate to inbox and pass the recipient data
+        console.log("Sending message to " + JSON.stringify(user));
         navigate('/inbox', { 
             state: { 
                 recipient: {
-                    userId: user.userId,
+                    userId: user.id,
                     name: user.name,
                     email: user.email
                 } 

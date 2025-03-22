@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './Inbox.css';
@@ -6,7 +6,11 @@ import './Inbox.css';
 interface Message {
   id: number;
   senderId: number;
+  senderName: string;
+  senderEmail: string;
   receiverId: number;
+  receiverName: string;
+  receiverEmail: string;
   readStatus: 'SENT' | 'READ';
   content: string;
   createdAt: string;
@@ -17,7 +21,6 @@ interface User {
   userId: number;
   name: string;
   email: string;
-  id?: number; // Some APIs might return id instead of userId
 }
 
 const Inbox: React.FC = () => {
@@ -26,9 +29,42 @@ const Inbox: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [myId, setMyId] = useState<number | null>(null);
   const { token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const messageListRef = useRef<HTMLDivElement>(null);
+  
+  // Fetch current user's ID
+  const fetchMyId = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/myId', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
+      if (response.ok) {
+        const id = await response.json();
+        setMyId(id);
+        console.log('Current user ID:', id);
+      }
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+    }
+  };
+
+  // Initial fetch of user ID
+  useEffect(() => {
+    if (token) {
+      fetchMyId();
+    }
+  }, [token]);
 
   // Check if we arrived from another user's profile
   useEffect(() => {
@@ -38,85 +74,133 @@ const Inbox: React.FC = () => {
       if (recipient.id && !recipient.userId) {
         recipient.userId = recipient.id;
       }
-      console.log("Setting recipient from location state:", recipient);
+      console.log('Setting selected contact from navigation:', recipient);
       setSelectedContact(recipient);
     }
   }, [location.state]);
 
-  // Fetch messages and contacts
+  // Scroll to bottom of message list when messages change
   useEffect(() => {
-    const fetchMessages = async () => {
-      setLoading(true);
-      try {
-        // In a real app, you would have an API endpoint that returns all messages
-        const response = await fetch('http://localhost:8080/getMessages', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [messages, selectedContact]);
+
+  // Fetch messages and contacts
+  const fetchMessages = async () => {
+    try {
+      // Fetch sent messages
+      const sentResponse = await fetch('http://localhost:8080/getSentMessages', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      // Fetch received messages
+      const receivedResponse = await fetch('http://localhost:8080/getReceivedMessages', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      // Check for unauthorized responses
+      if (sentResponse.status === 401 || receivedResponse.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
+      if (sentResponse.ok && receivedResponse.ok) {
+        const sentData = await sentResponse.json();
+        const receivedData = await receivedResponse.json();
         
-        if (response.ok) {
-          const data = await response.json();
-          setMessages(data);
-          
-          // Extract unique contacts from messages
-          const uniqueContacts = new Map<number, User>();
-          
-          data.forEach((message: Message) => {
-            if (!uniqueContacts.has(message.senderId) && message.senderId !== Number(localStorage.getItem('userId'))) {
-              fetch(`http://localhost:8080/profile/${message.senderId}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              })
-                .then(res => res.json())
-                .then(userData => {
-                  // Ensure we have userId even if API returns id
-                  const user = userData.user;
-                  if (user.id && !user.userId) {
-                    user.userId = user.id;
-                  }
-                  uniqueContacts.set(message.senderId, user);
-                  setContacts(Array.from(uniqueContacts.values()));
-                });
-            }
-            
-            if (!uniqueContacts.has(message.receiverId) && message.receiverId !== Number(localStorage.getItem('userId'))) {
-              fetch(`http://localhost:8080/profile/${message.receiverId}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              })
-                .then(res => res.json())
-                .then(userData => {
-                  // Ensure we have userId even if API returns id
-                  const user = userData.user;
-                  if (user.id && !user.userId) {
-                    user.userId = user.id;
-                  }
-                  uniqueContacts.set(message.receiverId, user);
-                  setContacts(Array.from(uniqueContacts.values()));
-                });
+        console.log('Fetched sent messages:', sentData);
+        console.log('Fetched received messages:', receivedData);
+        
+        // Combine sent and received messages
+        const allMessages = [...sentData, ...receivedData];
+        console.log('Combined all messages:', allMessages);
+        setMessages(allMessages);
+        
+        // Extract unique contacts from messages
+        const uniqueContacts = new Map<number, User>();
+        
+        // Get current user ID from sent messages
+        const myId = sentData.length > 0 ? sentData[0].senderId : null;
+        console.log('Current user ID from messages:', myId);
+        
+        if (myId) {
+          // Extract contacts from sent messages (recipients)
+          sentData.forEach((message: Message) => {
+            if (!uniqueContacts.has(message.receiverId) && message.receiverId !== myId) {
+              uniqueContacts.set(message.receiverId, {
+                userId: message.receiverId,
+                name: message.receiverName,
+                email: message.receiverEmail
+              });
             }
           });
+          
+          // Extract contacts from received messages (senders)
+          receivedData.forEach((message: Message) => {
+            if (!uniqueContacts.has(message.senderId) && message.senderId !== myId) {
+              uniqueContacts.set(message.senderId, {
+                userId: message.senderId,
+                name: message.senderName,
+                email: message.senderEmail
+              });
+            }
+          });
+          
+          const contactsArray = Array.from(uniqueContacts.values());
+          console.log('Updated contacts:', contactsArray);
+          setContacts(contactsArray);
         }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error('Failed to fetch messages:', {
+          sentStatus: sentResponse.status,
+          receivedStatus: receivedResponse.status
+        });
       }
-    };
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Handle unauthorized responses
+  const handleUnauthorized = () => {
+    // Clear token and userId from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    // Redirect to login page
+    navigate('/login');
+  };
+
+  // Initial fetch
+  useEffect(() => {
     if (token) {
+      setLoading(true);
       fetchMessages();
     }
+  }, [token]);
+
+  // Set up periodic refresh for new messages (every 10 seconds)
+  useEffect(() => {
+    if (!token) return;
+    
+    const intervalId = setInterval(() => {
+      fetchMessages();
+    }, 10000);
+    
+    return () => clearInterval(intervalId);
   }, [token]);
 
   const handleSendMessage = async () => {
     if (!selectedContact || !newMessage.trim()) return;
     
     // Make sure we have a valid userId
-    const receiverId = selectedContact.userId || selectedContact.id;
+    const receiverId = selectedContact.userId;
     
     if (!receiverId) {
       console.error("Cannot send message: receiverId is undefined");
@@ -138,44 +222,42 @@ const Inbox: React.FC = () => {
         })
       });
       
+      // Check for unauthorized response
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      
       if (response.ok) {
         const sentMessage = await response.json();
+        console.log('Message sent successfully:', sentMessage);
+        
+        // Add the new message to our messages state
         setMessages(prev => [...prev, sentMessage]);
         setNewMessage('');
+        
+        // Immediately refresh messages to ensure we get the latest
+        fetchMessages();
       }
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
 
-  const markAsRead = async (messageId: number) => {
-    try {
-      const response = await fetch('http://localhost:8080/readMessage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(messageId)
-      });
-      
-      if (response.ok) {
-        const updatedMessage = await response.json();
-        setMessages(prev => 
-          prev.map(msg => msg.id === messageId ? updatedMessage : msg)
-        );
-      }
-    } catch (error) {
-      console.error('Error marking message as read:', error);
-    }
-  };
-
-  const getConversation = (userId: number) => {
-    const myId = Number(localStorage.getItem('userId'));
-    return messages.filter(
+  const getConversation = (userId: number | undefined) => {
+    if (!userId || !myId) return [];
+    
+    console.log('Getting conversation between', myId, 'and', userId);
+    console.log('Available messages:', messages);
+    
+    const filteredMessages = messages.filter(
       msg => (msg.senderId === userId && msg.receiverId === myId) || 
              (msg.senderId === myId && msg.receiverId === userId)
-    ).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    );
+    
+    console.log('Filtered messages for conversation:', filteredMessages);
+    
+    return filteredMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   };
 
   if (loading) {
@@ -225,26 +307,27 @@ const Inbox: React.FC = () => {
                 <h2>Conversation with {selectedContact.name}</h2>
               </div>
               
-              <div className="messages-list">
+              <div className="messages-list" ref={messageListRef}>
                 {getConversation(selectedContact.userId).length === 0 ? (
                   <p className="no-messages">No messages yet. Send a message to start the conversation.</p>
                 ) : (
                   getConversation(selectedContact.userId).map(message => {
-                    const isMyMessage = message.senderId === Number(localStorage.getItem('userId'));
-                    
-                    // Mark message as read if it's not mine and not read yet
-                    if (!isMyMessage && message.readStatus === 'SENT') {
-                      markAsRead(message.id);
-                    }
+                    const isMyMessage = message.senderId === myId;
                     
                     return (
                       <div 
                         key={message.id} 
                         className={`message-bubble ${isMyMessage ? 'my-message' : 'their-message'}`}
+                        style={{ alignSelf: isMyMessage ? 'flex-end' : 'flex-start' }}
                       >
                         <div className="message-content">{message.content}</div>
                         <div className="message-time">
                           {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {isMyMessage && (
+                            <span className="message-status">
+                              {message.readStatus === 'READ' ? ' (Read)' : ' (Sent)'}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );

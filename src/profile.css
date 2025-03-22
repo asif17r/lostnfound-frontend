@@ -65,29 +65,37 @@
 .profile-actions {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
-.update-profile-btn, .message-btn {
-    padding: 0.75rem 1.25rem;
+.update-profile-btn,
+.message-btn {
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius-md);
-    font-weight: 600;
     cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     transition: all 0.2s;
+    min-width: 140px;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .update-profile-btn {
     background-color: var(--primary-color);
     color: white;
     border: none;
+    margin: 24px 0px 0px;
 }
 
 .update-profile-btn:hover {
     background-color: var(--primary-hover);
 }
 
-.message-btn {
-    background-color: var(--background-color);
+.message-btn {  
+    background-color: var(--background-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
