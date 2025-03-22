@@ -48,6 +48,7 @@ const Profile: React.FC = () => {
                 <p><strong>Address:</strong> {user.address}</p>
                 <p><strong>Department:</strong> {user.department}</p>
                 <button onClick={() => navigate('/updateProfile')}>Update Profile</button>
+                <button onClick={() => navigate('/updatePassword')}>Update Password</button>
 
             </div>
             <div className="user-posts">
@@ -58,6 +59,7 @@ const Profile: React.FC = () => {
                         <p><strong>Category:</strong> {post.category}</p>
                         <p><strong>Status:</strong> {post.status}</p>
                         <button onClick={() => window.location.href = `/posts/${post.id}`}>See Details</button>
+                        
                     </div>
     
                 ))}
