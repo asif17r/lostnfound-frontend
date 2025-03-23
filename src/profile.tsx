@@ -48,8 +48,6 @@ const Profile: React.FC = () => {
             const data = response.data as { user: User; posts: Post[] };
             setUser(data.user);
             setPosts(data.posts);
-            // Store the userId in localStorage for later use
-            localStorage.setItem('userId', data.user.userId.toString());
             })
             .catch(error => console.error('Error fetching profile data:', error));
     }, []);
@@ -58,10 +56,17 @@ const Profile: React.FC = () => {
         return <div>Loading...</div>;
     }
 
+
     return (
         <div className="profile-container">
             <div className="user-info">
-                <h2>{user.name}</h2>
+                <div className="user-header">
+                    <h2>{user.name}</h2>
+                    <button className="" onClick={() => navigate('/inbox')}>
+                        <MessageIcon />
+                        Inbox
+                    </button>
+                </div>
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>Address:</strong> {user.address}</p>
                 <p><strong>Department:</strong> {user.department}</p>
@@ -70,9 +75,12 @@ const Profile: React.FC = () => {
                         <EditIcon />
                         Update Profile
                     </button>
-                    <button className="message-btn" onClick={() => navigate('/inbox')}>
-                        <MessageIcon />
-                        View Messages
+                    <button className="settings-btn" onClick={() => navigate('/passwordchange')}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Change your password
                     </button>
                 </div>
             </div>
@@ -85,11 +93,9 @@ const Profile: React.FC = () => {
                         <p><strong>Status:</strong> {post.status}</p>
                         <button onClick={() => window.location.href = `/post/${post.id}`}>See Details</button>
                     </div>
-    
                 ))}
             </div>
         </div>
     );
 };
-
 export default Profile;
