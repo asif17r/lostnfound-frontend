@@ -9,8 +9,10 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-    },
-    withCredentials: true // Enable credentials for CORS
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept, Origin, X-Requested-With'
+    }
 });
 
 // Add response interceptor for global error handling
@@ -98,15 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (!token) return false;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/validate`, {
+            const response = await api.get('/validate', {
                 headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 logout();
                 return false;
             }
