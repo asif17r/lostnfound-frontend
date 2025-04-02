@@ -11,6 +11,7 @@ const Signup: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [address, setAddress] = useState('');
     const [department, setDepartment] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const { signup } = useAuth();
     const { showError } = useError();
@@ -23,6 +24,7 @@ const Signup: React.FC = () => {
             return;
         }
 
+        setIsLoading(true);
         try {
             const userEmail = await signup({
                 name,
@@ -34,6 +36,8 @@ const Signup: React.FC = () => {
             navigate('/verify-email', { state: { email: userEmail } });
         } catch (err) {
             // Error is already handled by AuthContext
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -118,8 +122,19 @@ const Signup: React.FC = () => {
                         />
                     </div>
 
-                    <button type="submit" className="auth-button">
-                        Create Account
+                    <button 
+                        type="submit" 
+                        className="auth-button" 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <span className="spinner"></span>
+                                Creating Account...
+                            </>
+                        ) : (
+                            'Create Account'
+                        )}
                     </button>
                 </form>
 

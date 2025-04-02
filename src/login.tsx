@@ -7,17 +7,21 @@ import './login.css';
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
     const { showError } = useError();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
             await login(email, password);
             navigate('/home');
         } catch (err) {
             // Error is already handled by AuthContext
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -54,8 +58,19 @@ const Login: React.FC = () => {
                         />
                     </div>
 
-                    <button type="submit" className="auth-button">
-                        Sign In
+                    <button 
+                        type="submit" 
+                        className="auth-button"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <span className="spinner"></span>
+                                Signing In...
+                            </>
+                        ) : (
+                            'Sign In'
+                        )}
                     </button>
                 </form>
 
