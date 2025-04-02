@@ -9,7 +9,8 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-    }
+    },
+    withCredentials: true // Enable credentials for CORS
 });
 
 // Add response interceptor for global error handling
