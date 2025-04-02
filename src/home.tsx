@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import Post, { Post as PostType } from './Post';
 import './home.css';
+import { API_BASE_URL } from './config';
 
 interface PostData extends PostType {}
 
@@ -39,7 +40,7 @@ const Home: React.FC = () => {
 
     const fetchPosts = async () => {
         try {
-            const response = await fetch('http://localhost:8080/posts', {
+            const response = await fetch(`${API_BASE_URL}/posts`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

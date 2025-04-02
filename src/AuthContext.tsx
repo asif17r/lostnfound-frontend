@@ -1,5 +1,6 @@
 import React, { createContext, useState, ReactNode, useContext } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from './config';
 
 interface SignupData {
     name: string;
@@ -36,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await axios.post<string>('http://localhost:8080/login', {
+            const response = await axios.post<string>(`${API_BASE_URL}/login`, {
                 email,
                 password
             });
@@ -50,7 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const signup = async (data: SignupData) => {
         try {
-            const response = await axios.post('http://localhost:8080/register', {
+            const response = await axios.post(`${API_BASE_URL}/register`, {
                 ...data,
                 role: 'USER'
             });
@@ -74,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (!token) return false;
 
         try {
-            const response = await fetch('http://localhost:8080/validate', {
+            const response = await fetch(`${API_BASE_URL}/validate`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

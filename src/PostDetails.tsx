@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import Comments from './Comments';
 import { useAuth } from './AuthContext';
 import './PostDetails.css';
+import { API_BASE_URL } from './config';
 
 interface Post {
     id: number;
@@ -30,7 +31,7 @@ const PostDetails: React.FC = () => {
     useEffect(() => {
         const fetchPostDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/posts/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -53,7 +54,7 @@ const PostDetails: React.FC = () => {
         if (!window.confirm('Are you sure you want to delete this post?')) return;
         
         try {
-            await fetch(`http://localhost:8080/posts/${id}`, {
+            await fetch(`${API_BASE_URL}/posts/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -69,7 +70,7 @@ const PostDetails: React.FC = () => {
     useEffect(() => {
         const fetchMyId = async () => {
             try {
-                const response = await fetch('http://localhost:8080/myId', {
+                const response = await fetch(`${API_BASE_URL}/myId`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`

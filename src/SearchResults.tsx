@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import Post, { Post as PostType } from './Post';
 import './SearchResults.css';
+import { API_BASE_URL } from './config';
 
 interface PostData extends PostType {}
 
@@ -53,7 +54,7 @@ const SearchResults: React.FC = () => {
                 limit: 20 // You can adjust this number based on your needs
             };
 
-            const response = await fetch('http://localhost:8080/enhancedSearch', {
+            const response = await fetch(`${API_BASE_URL}/enhancedSearch`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

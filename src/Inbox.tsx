@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './Inbox.css';
+import { API_BASE_URL } from './config';
 
 interface Message {
   id: number;
@@ -38,7 +39,7 @@ const Inbox: React.FC = () => {
   // Fetch current user's ID
   const fetchMyId = async () => {
     try {
-      const response = await fetch('http://localhost:8080/myId', {
+      const response = await fetch(`${API_BASE_URL}/myId`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -90,14 +91,14 @@ const Inbox: React.FC = () => {
   const fetchMessages = async () => {
     try {
       // Fetch sent messages
-      const sentResponse = await fetch('http://localhost:8080/getSentMessages', {
+      const sentResponse = await fetch(`${API_BASE_URL}/getSentMessages`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
       // Fetch received messages
-      const receivedResponse = await fetch('http://localhost:8080/getReceivedMessages', {
+      const receivedResponse = await fetch(`${API_BASE_URL}/getReceivedMessages`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -210,7 +211,7 @@ const Inbox: React.FC = () => {
     console.log("Sending message to " + receiverId);
     
     try {
-      const response = await fetch('http://localhost:8080/sendMesssage', {
+      const response = await fetch(`${API_BASE_URL}/sendMesssage`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

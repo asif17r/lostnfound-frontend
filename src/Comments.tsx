@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './Comments.css';
+import { API_BASE_URL } from './config';
 
 interface Comment {
     id: number;
@@ -28,7 +29,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
     useEffect(() => {
         const fetchUserId = async () => {
             try {
-                const response = await fetch('http://localhost:8080/myId', {
+                const response = await fetch(`${API_BASE_URL}/myId`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -49,7 +50,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
     // Fetch comments
     const fetchComments = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/comments`, {
+            const response = await fetch(`${API_BASE_URL}/comments`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -66,7 +67,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
         if (usernames.has(userId)) return;
 
         try {
-            const response = await fetch(`http://localhost:8080/profile/${userId}`, {
+            const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -95,7 +96,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
         if (userId === null) return;
 
         try {
-            const response = await fetch('http://localhost:8080/comments', {
+            const response = await fetch(`${API_BASE_URL}/comments`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -118,7 +119,7 @@ const Comments: React.FC<CommentsProps> = ({ postId }) => {
         if (!window.confirm('Are you sure you want to delete this comment?')) return;
         
         try {
-            await fetch(`http://localhost:8080/comments/${commentId}`, {
+            await fetch(`${API_BASE_URL}/comments/${commentId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from './config';
 
 const UpdateComment: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Change commentId to id
@@ -15,7 +16,7 @@ const UpdateComment: React.FC = () => {
 
         const fetchComment = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/comments/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/comments/${id}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -43,7 +44,7 @@ const UpdateComment: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/comments/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/comments/${id}`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Post } from './Post';
 import './profile.css';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from './config';
 
 interface User {
     userId: number;
@@ -39,7 +40,7 @@ const Profile: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/profile', {
+        axios.get(`${API_BASE_URL}/profile`, {
             headers: {
             Authorization: `Bearer ${token}`
             }

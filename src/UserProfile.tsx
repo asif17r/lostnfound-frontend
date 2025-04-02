@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Post } from './Post';
 import { useAuth } from './AuthContext';
 import './UserProfile.css';
+import { API_BASE_URL } from './config';
 
 const UserProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -15,7 +16,7 @@ const UserProfile: React.FC = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/profile/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/profile/${id}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`

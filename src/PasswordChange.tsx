@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './PasswordChange.css';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from './config';
 
 const PasswordChange: React.FC = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -20,7 +21,7 @@ const PasswordChange: React.FC = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:8080/profile/password', {
+            await axios.put(`${API_BASE_URL}/profile/password`, {
                 currentPassword,
                 newPassword
             }, {

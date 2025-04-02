@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './createPost.css';
+import { API_BASE_URL } from './config';
 
 const UpdatePost: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -22,7 +23,7 @@ const UpdatePost: React.FC = () => {
     useEffect(() => {
         const fetchPostDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/posts/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -64,7 +65,7 @@ const UpdatePost: React.FC = () => {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:8080/posts/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
