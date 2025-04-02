@@ -8,10 +8,7 @@ const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept, Origin, X-Requested-With'
+        'Accept': 'application/json'
     }
 });
 
@@ -19,6 +16,7 @@ const api = axios.create({
 api.interceptors.response.use(
     response => response,
     error => {
+        console.error("API Error:", error);
         // Handle the ResponseEntity format
         const errorMessage = error.response?.data || 'An error occurred. Please try again.';
         throw new Error(errorMessage);
