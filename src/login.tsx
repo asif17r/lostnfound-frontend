@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useError } from './contexts/ErrorContext';
 import './login.css';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { showError } = useError();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
             await login(email, password);
             navigate('/home');
         } catch (err) {
-            setError('Invalid email or password');
+            // Error is already handled by AuthContext
         }
     };
 
@@ -29,8 +30,6 @@ const Login: React.FC = () => {
                 </div>
                 
                 <form onSubmit={handleSubmit} className="auth-form">
-                    {error && <div className="error-message">{error}</div>}
-                    
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input

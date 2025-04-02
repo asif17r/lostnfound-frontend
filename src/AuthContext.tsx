@@ -1,6 +1,26 @@
 import React, { createContext, useState, ReactNode, useContext } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from './config';
+import { useError } from './contexts/ErrorContext';
+
+// Create axios instance with default config
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
+});
+
+// Add response interceptor for global error handling
+api.interceptors.response.use(
+    response => response,
+    error => {
+        // Handle the ResponseEntity format
+        const errorMessage = error.response?.data || 'An error occurred. Please try again.';
+        throw new Error(errorMessage);
+    }
+);
 
 interface SignupData {
     name: string;
@@ -13,7 +33,7 @@ interface SignupData {
 interface AuthContextType {
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
-    signup: (data: SignupData) => Promise<void>;
+    signup: (data: SignupData) => Promise<string>;
     logout: () => void;
     isTokenValid: () => Promise<boolean>;
 }
@@ -34,10 +54,11 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+    const { showError } = useError();
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await axios.post<string>(`${API_BASE_URL}/login`, {
+            const response = await api.post<string>('/login', {
                 email,
                 password
             });
@@ -45,24 +66,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.setItem('token', newToken);
             setToken(newToken);
         } catch (error) {
-            throw new Error('Invalid email or password');
+            showError(error instanceof Error ? error.message : 'Invalid email or password');
+            throw error;
         }
     };
 
-    const signup = async (data: SignupData) => {
+    const signup = async (data: SignupData): Promise<string> => {
         try {
-            const response = await axios.post(`${API_BASE_URL}/register`, {
+            const response = await api.post('/register', {
                 ...data,
                 role: 'USER'
             });
             if (response.status === 201) {
-                // After successful signup, automatically log in
-                await login(data.email, data.password);
+                return data.email;
             } else {
                 throw new Error('Failed to create account');
             }
         } catch (error) {
-            throw new Error('Failed to create account');
+            showError(error instanceof Error ? error.message : 'Failed to create account');
+            throw error;
         }
     };
 
@@ -76,7 +98,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         try {
             const response = await fetch(`${API_BASE_URL}/validate`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
 
             if (!response.ok) {
