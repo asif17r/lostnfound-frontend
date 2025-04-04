@@ -18,6 +18,8 @@ import UpdateComment from './UpdateComment';
 import Inbox from './Inbox';
 import PasswordChange from './PasswordChange';
 import VerificationPage from './VerificationPage';
+import ForgotPassword from './ForgotPassword';
+import ResetPasswordConfirmation from './ResetPasswordConfirmation';
 
 const App: React.FC = () => {
     return (
@@ -29,6 +31,8 @@ const App: React.FC = () => {
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/verify-email" element={<VerificationPage />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password-confirmation" element={<ResetPasswordConfirmation />} />
                         <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                         <Route path="/search" element={<ProtectedRoute><SearchResults /></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
