@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './UpdateProfile.css';
+import { API_BASE_URL } from './config';
 
 interface User {
     userId: number;
@@ -23,7 +24,7 @@ const UpdateProfile: React.FC = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/profile', {
+                const response = await axios.get(`${API_BASE_URL}/profile`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -45,7 +46,7 @@ const UpdateProfile: React.FC = () => {
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.put('http://localhost:8080/updateProfile', {
+            await axios.put(`${API_BASE_URL}/updateProfile`, {
                 name,
                 email,
                 address,

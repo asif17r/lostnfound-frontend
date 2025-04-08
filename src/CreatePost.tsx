@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './createPost.css';
+import { API_BASE_URL } from './config';
 
 const CreatePost: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -24,7 +25,7 @@ const CreatePost: React.FC = () => {
 
         try {
             const postData = { title, description, location, date, time, status, category, range };
-            const response = await fetch('http://localhost:8080/posts', {
+            const response = await fetch(`${API_BASE_URL}/posts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
