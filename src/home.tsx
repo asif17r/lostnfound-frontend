@@ -100,6 +100,7 @@ const Home: React.FC = () => {
                     </button>
                     
                     <div className="search-container">
+                        <SearchIcon />
                         <input
                             type="text"
                             className="search-bar"
@@ -139,6 +140,8 @@ const Home: React.FC = () => {
             <main className="posts-container">
                 {loading ? (
                     <div className="loading">Loading posts...</div>
+                ) : error ? (
+                    <div className="error-message">{error}</div>
                 ) : (
                     posts.map((post) => (
                         <Post key={post.id} post={post} />

@@ -19,7 +19,7 @@ const Login: React.FC = () => {
             await login(email, password);
             navigate('/home');
         } catch (err) {
-            // Error is already handled by AuthContext
+            showError('Login failed. Please check your credentials and try again.');
         } finally {
             setIsLoading(false);
         }

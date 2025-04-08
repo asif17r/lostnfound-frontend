@@ -13,11 +13,6 @@ interface User {
     department: string;
 }
 
-interface ProfileProps {
-    user: User;
-    posts: Post[];
-}
-
 // Add icons
 const EditIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -40,6 +35,7 @@ const Profile: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         axios.get(`${API_BASE_URL}/profile`, {
             headers: {
             Authorization: `Bearer ${token}`
@@ -49,14 +45,21 @@ const Profile: React.FC = () => {
             const data = response.data as { user: User; posts: Post[] };
             setUser(data.user);
             setPosts(data.posts);
+            setLoading(false);
             })
-            .catch(error => console.error('Error fetching profile data:', error));
+            .catch(error => {
+                console.error('Error fetching profile data:', error);
+                setLoading(false);
+            });
     }, []);
 
-    if (!user) {
-        return <div>Loading...</div>;
+    if (loading) {
+        return <div className="loading">Loading profile data...</div>;
     }
 
+    if (!user) {
+        return <div>No user data available</div>;
+    }
 
     return (
         <div className="profile-container">
