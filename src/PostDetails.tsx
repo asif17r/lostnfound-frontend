@@ -2,28 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Comments from './Comments';
 import { useAuth } from './AuthContext';
+import { Post } from './types';
+import { fetchImageUrl } from './utils';
 import './PostDetails.css';
 import { API_BASE_URL } from './config';
-
-interface Post {
-    id: number;
-    title: string;
-    description: string;
-    location: string;
-    date: string;
-    time: string;
-    category: string;
-    status: string;
-    range: number;
-    userId: number;
-    userName: string;
-}
 
 const PostDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [post, setPost] = useState<Post | null>(null);
     const [myId, setMyId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
     const navigate = useNavigate();
     const { token } = useAuth();
 
@@ -37,8 +26,19 @@ const PostDetails: React.FC = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const data = await response.json();
-                setPost(data);
+
+                if (response.ok) {
+                    const data = (await response.json()) as Post;
+                    setPost(data);
+
+                    // Load image if available
+                    if (token) {
+                        const url = await fetchImageUrl(data.imageId, token);
+                        setImageUrl(url);
+                    }
+                } else {
+                    throw new Error('Failed to fetch post details');
+                }
             } catch (error) {
                 console.error('Error fetching post details:', error);
             } finally {
@@ -172,6 +172,11 @@ const PostDetails: React.FC = () => {
 
                 <div className="post-details-main">
                     <h1 className="post-title">{post.title}</h1>
+                    {imageUrl && (
+                        <div className="post-image">
+                            <img src={imageUrl} alt={post.title} />
+                        </div>
+                    )}
                     <p className="post-description">{post.description}</p>
 
                     <div className="post-info-grid">

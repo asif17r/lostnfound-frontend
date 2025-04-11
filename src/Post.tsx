@@ -1,26 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Post as PostType } from './types';
 import './Post.css';
-
-export interface Post {
-    id: number;
-    title: string;
-    description: string;
-    location: string;
-    date: string;
-    time: string;
-    category: string;
-    status: string;
-    range: number;
-    userId: number;
-    userName: string;
-}
+import { fetchImageUrl } from './utils';
+import { useAuth } from './AuthContext';
 
 interface PostProps {
-    post: Post;
+    post: PostType;
 }
 
 const Post: React.FC<PostProps> = ({ post }) => {
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const { token } = useAuth();
+
+    useEffect(() => {
+        const loadImage = async () => {
+            if (post.imageId && token) {
+                const url = await fetchImageUrl(post.imageId, token);
+                setImageUrl(url);
+            }
+        };
+        loadImage();
+    }, [post.imageId, token]);
+
     // Format the date and time together
     const formatDateTime = () => {
         const date = new Date(post.date);
@@ -59,6 +61,11 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
                 <div className="post-content">
                     <h2 className="post-title">{post.title}</h2>
+                    {imageUrl && (
+                        <div className="post-thumbnail">
+                            <img src={imageUrl} alt={post.title} />
+                        </div>
+                    )}
                     <p className="post-description">{post.description}</p>
                     <div className="post-details">
                         <span className="location">

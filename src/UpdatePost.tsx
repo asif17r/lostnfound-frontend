@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { fetchImageUrl } from './utils';
+import { Post } from './types';
 import './createPost.css';
 import { API_BASE_URL } from './config';
 
@@ -14,6 +16,10 @@ const UpdatePost: React.FC = () => {
     const [category, setCategory] = useState('DOCUMENTS');
     const [location, setLocation] = useState('');
     const [range, setRange] = useState(5);
+    const [image, setImage] = useState<File | null>(null);
+    const [currentImageId, setCurrentImageId] = useState<number | null>(null);
+    const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -36,7 +42,7 @@ const UpdatePost: React.FC = () => {
                 }
 
                 if (response.ok) {
-                    const data = await response.json();
+                    const data = (await response.json()) as Post;
                     setTitle(data.title);
                     setDescription(data.description);
                     setDate(data.date);
@@ -45,6 +51,13 @@ const UpdatePost: React.FC = () => {
                     setCategory(data.category);
                     setLocation(data.location);
                     setRange(data.range || 5);
+                    setCurrentImageId(data.imageId);
+                    
+                    // Fetch current image if it exists
+                    if (token) {
+                        const url = await fetchImageUrl(data.imageId, token);
+                        setCurrentImageUrl(url);
+                    }
                 } else {
                     throw new Error('Failed to fetch post details');
                 }
@@ -59,19 +72,74 @@ const UpdatePost: React.FC = () => {
         fetchPostDetails();
     }, [id, token, navigate]);
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
         setError(null);
 
         try {
+            let imageId = currentImageId;
+            if (image) {
+                // Upload the new image
+                const imageFormData = new FormData();
+                imageFormData.append('file', image);
+                const imageResponse = await fetch(`${API_BASE_URL}/images`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: imageFormData
+                });
+
+                if (!imageResponse.ok) {
+                    throw new Error('Failed to upload image');
+                }
+
+                const imageData = await imageResponse.json();
+                imageId = imageData.id;
+
+                // Delete the old image if it exists
+                if (currentImageId) {
+                    try {
+                        await fetch(`${API_BASE_URL}/images/${currentImageId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Failed to delete old image:', error);
+                    }
+                }
+            }
+
+            const postData = {
+                title,
+                description,
+                date,
+                time,
+                status,
+                category,
+                location,
+                range,
+                imageId
+            };
+
             const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title, description, date, time, status, category, location, range })
+                body: JSON.stringify(postData)
             });
 
             if (response.ok) {
@@ -219,6 +287,29 @@ const UpdatePost: React.FC = () => {
                         <span className="range-value">{range} km</span>
                     </div>
                     <p className="range-description">Set the radius within which the item might be found</p>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="image">Image</label>
+                    {currentImageUrl && !imagePreview && (
+                        <div className="current-image">
+                            <img src={currentImageUrl} alt="Current" />
+                            <p>Current image</p>
+                        </div>
+                    )}
+                    <input
+                        id="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="file-input"
+                    />
+                    {imagePreview && (
+                        <div className="image-preview">
+                            <img src={imagePreview} alt="Preview" />
+                            <p>New image</p>
+                        </div>
+                    )}
                 </div>
 
                 {error && (

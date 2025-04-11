@@ -13,10 +13,20 @@ const CreatePost: React.FC = () => {
     const [status, setStatus] = useState('LOST');
     const [category, setCategory] = useState('DOCUMENTS');
     const [range, setRange] = useState(5); // Default range of 5km
+    const [image, setImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const { token } = useAuth();
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,24 +34,48 @@ const CreatePost: React.FC = () => {
         setError(null);
 
         try {
-            const postData = { title, description, location, date, time, status, category, range };
+            // Create the form data object
+            const formData = new FormData();
+            
+            // Create the post data object
+            const postData = { 
+                title, 
+                description, 
+                location, 
+                date, 
+                time, 
+                status, 
+                category, 
+                range
+            };
+
+            // Add the JSON string as postDto
+            formData.append('postDto', JSON.stringify(postData));
+
+            // Add the image if it exists
+            if (image) {
+                formData.append('image', image);
+            }
+
+            // Send the request
             const response = await fetch(`${API_BASE_URL}/posts`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(postData)
+                body: formData
             });
 
-            if (response.ok) {
-                navigate('/home');
-            } else {
+            if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to create post');
+                throw new Error(errorData || 'Failed to create post');
             }
+
+            // Navigate to home after successful creation
+            navigate('/home');
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred while creating the post');
+            console.error('Error creating post:', error);
         } finally {
             setLoading(false);
         }
@@ -170,6 +204,22 @@ const CreatePost: React.FC = () => {
                         <span className="range-value">{range} km</span>
                     </div>
                     <p className="range-description">Set the radius within which the item might be found</p>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="image">Image (Optional)</label>
+                    <input
+                        id="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="file-input"
+                    />
+                    {imagePreview && (
+                        <div className="image-preview">
+                            <img src={imagePreview} alt="Preview" />
+                        </div>
+                    )}
                 </div>
 
                 {error && (
