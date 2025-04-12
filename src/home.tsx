@@ -22,25 +22,33 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
     const { token, logout } = useAuth();
     const [error, setError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
         if (!token) {
             navigate('/login');
             return;
         }
-        fetchPosts();
-    }, [token, navigate]);
+        const timer = setTimeout(() => {
+            fetchPosts();
+        }, retryCount * 1000); // Add delay for retries
+
+        return () => clearTimeout(timer);
+    }, [token, navigate, retryCount]);
 
     const fetchPosts = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/posts`, {
+                method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'omit' // Explicitly exclude credentials
             });
             
             if (response.status === 401) {
-                // Token expired or invalid
                 logout();
                 navigate('/login');
                 return;
@@ -49,11 +57,19 @@ const Home: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 setPosts(data);
+                setError(null);
+                setRetryCount(0); // Reset retry count on success
             } else {
                 throw new Error('Failed to fetch posts');
             }
         } catch (error) {
+            console.error('Fetch error:', error);
             setError('Failed to fetch posts');
+            
+            // Implement retry logic (max 3 attempts)
+            if (retryCount < 3) {
+                setRetryCount(prev => prev + 1);
+            }
         } finally {
             setLoading(false);
         }

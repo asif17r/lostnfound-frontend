@@ -34,10 +34,7 @@ const CreatePost: React.FC = () => {
         setError(null);
 
         try {
-            // Create the form data object
             const formData = new FormData();
-            
-            // Create the post data object
             const postData = { 
                 title, 
                 description, 
@@ -49,30 +46,51 @@ const CreatePost: React.FC = () => {
                 range
             };
 
-            // Add the JSON string as postDto
+            // Append the JSON string directly
             formData.append('postDto', JSON.stringify(postData));
 
-            // Add the image if it exists
             if (image) {
                 formData.append('image', image);
             }
 
-            // Send the request
             const response = await fetch(`${API_BASE_URL}/posts`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
-                body: formData
+                body: formData,
+                credentials: 'omit'
             });
 
+            // Clone the response before reading it
+            const responseClone = response.clone();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData || 'Failed to create post');
+                let errorMessage = 'Failed to create post';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    // If JSON parsing fails, try to get the text
+                    try {
+                        const textError = await responseClone.text();
+                        if (textError) {
+                            errorMessage = textError;
+                        }
+                    } catch {
+                        // If both attempts fail, use the default error message
+                    }
+                }
+                throw new Error(errorMessage);
             }
 
-            // Navigate to home after successful creation
-            navigate('/home');
+            // If there's an image, wait for it to be processed
+            if (image) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+
+            // Use window.location.href instead of navigate for a full page reload
+            window.location.href = '/home';
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred while creating the post');
             console.error('Error creating post:', error);
