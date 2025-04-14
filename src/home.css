@@ -346,6 +346,9 @@
 
 .search-container {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: var(--spacing-lg);
 }
 
@@ -372,6 +375,29 @@
     outline: none;
     background-color: var(--background-color);
     box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.image-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.image-search-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
+}
+
+.image-search-btn svg {
+    width: 20px;
+    height: 20px;
+    color: #666;
 }
 
 .trending-section, .who-to-follow {
@@ -411,7 +437,7 @@
 
 .trending-posts {
     font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+    color: var (--text-secondary);
 }
 
 .home-container {

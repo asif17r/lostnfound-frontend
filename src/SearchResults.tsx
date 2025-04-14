@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import Post, { Post as PostType } from './Post';
+import Post from './Post';
+import { Post as PostType } from './types';
 import './SearchResults.css';
 import { API_BASE_URL } from './config';
-
-interface PostData extends PostType {}
 
 interface SearchQuery {
     query: string;
@@ -14,7 +13,7 @@ interface SearchQuery {
 
 const SearchResults: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [posts, setPosts] = useState<PostData[]>([]);
+    const [posts, setPosts] = useState<PostType[]>([]);
     const [loading, setLoading] = useState(true);
     const [searching, setSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -35,11 +34,25 @@ const SearchResults: React.FC = () => {
             }
 
             const query = searchParams.get('q') || '';
+            const type = searchParams.get('type');
+            
             setSearchQuery(query);
-            if (query) {
-                fetchSearchResults(query);
-            } else {
+            
+            if (type === 'image') {
+                // Get image search results from sessionStorage
+                const imageResults = sessionStorage.getItem('imageSearchResults');
+                if (imageResults) {
+                    setPosts(JSON.parse(imageResults));
+                }
                 setLoading(false);
+            } else {
+                // Clear image search results when navigating to regular search
+                sessionStorage.removeItem('imageSearchResults');
+                if (query) {
+                    fetchSearchResults(query);
+                } else {
+                    setLoading(false);
+                }
             }
         };
 
@@ -129,6 +142,16 @@ const SearchResults: React.FC = () => {
                                 className="search-input"
                             />
                         </div>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/image-search')}
+                            className="image-search-button"
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                            </svg>
+                            Search with Image
+                        </button>
                     </form>
                 </div>
             </header>
@@ -142,7 +165,11 @@ const SearchResults: React.FC = () => {
                 ) : (
                     <>
                         <div className="search-info">
-                            <h2>Results for "{searchQuery}"</h2>
+                            <h2>
+                                {searchParams.get('type') === 'image' 
+                                    ? 'Image Search Results' 
+                                    : `Results for "${searchQuery}"`}
+                            </h2>
                             <p>{posts.length} {posts.length === 1 ? 'result' : 'results'} found</p>
                         </div>
 
@@ -171,4 +198,4 @@ const SearchResults: React.FC = () => {
     );
 };
 
-export default SearchResults; 
+export default SearchResults;

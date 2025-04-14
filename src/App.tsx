@@ -20,6 +20,7 @@ import PasswordChange from './PasswordChange';
 import VerificationPage from './VerificationPage';
 import ForgotPassword from './ForgotPassword';
 import ResetPasswordConfirmation from './ResetPasswordConfirmation';
+import ImageSearch from './ImageSearch';
 
 const App: React.FC = () => {
     return (
@@ -44,6 +45,7 @@ const App: React.FC = () => {
                         <Route path="/UpdateProfile" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
                         <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
                         <Route path="/passwordchange" element={<ProtectedRoute><PasswordChange /></ProtectedRoute>} />
+                        <Route path="/image-search" element={<ProtectedRoute><ImageSearch /></ProtectedRoute>} />
                         {/* Add other routes here */}
                     </Routes>
                 </Router>

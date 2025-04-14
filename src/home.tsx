@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import Post, { Post as PostType } from './Post';
+import Post from './Post';
 import './home.css';
 import { API_BASE_URL } from './config';
 
-interface PostData extends PostType {}
+interface PostType {
+    id: number;
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    location: string;
+    status: string;
+    category: string;
+    range: number;
+    imageId: number | null;
+    userId: number;
+    userName: string;
+}
 
 // Add icons
 const CreatePostIcon = () => (
@@ -15,8 +28,16 @@ const CreatePostIcon = () => (
   </svg>
 );
 
+const ImageSearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+    <circle cx="8.5" cy="8.5" r="1.5"/>
+    <path d="M21 15l-5-5L5 21"/>
+  </svg>
+);
+
 const Home: React.FC = () => {
-    const [posts, setPosts] = useState<PostData[]>([]);
+    const [posts, setPosts] = useState<PostType[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
@@ -121,6 +142,13 @@ const Home: React.FC = () => {
                                 }
                             }}
                         />
+                        <button
+                            className="image-search-btn"
+                            onClick={() => navigate('/image-search')}
+                            title="Search with image"
+                        >
+                            <ImageSearchIcon />
+                        </button>
                     </div>
 
                     <div className="profile-menu">
