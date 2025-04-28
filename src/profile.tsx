@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Post } from './Post';
-import './profile.css';
 import { useNavigate } from 'react-router-dom';
+import { Post } from './types';
+import './profile.css';
 import { API_BASE_URL } from './config';
 
 interface User {

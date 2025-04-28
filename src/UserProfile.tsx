@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Post } from './Post';
+import { Post } from './types';
 import { useAuth } from './AuthContext';
 import './UserProfile.css';
 import { API_BASE_URL } from './config';
